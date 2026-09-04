@@ -1,0 +1,115 @@
+/* 动效关键帧（doc/03 §4 / doc/04 §5）
+   全部动画包在 no-preference 内；reduced-motion 直接呈现终态。 */
+@media (prefers-reduced-motion: no-preference) {
+  /* 雷达扫描：加载屏一次性旋转 */
+  @keyframes radar-spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+  }
+
+  /* Glitch 转场：两帧 clip-path 切片错位 + RGB 色散 */
+  @keyframes glitch-frames {
+    0% {
+      clip-path: inset(0 0 0 0);
+      transform: translateX(0);
+      filter: none;
+    }
+    15% {
+      clip-path: inset(8% 0 78% 0);
+      transform: translateX(-2px);
+      filter: drop-shadow(2px 0 var(--alert)) drop-shadow(-2px 0 var(--rad));
+    }
+    30% {
+      clip-path: inset(62% 0 18% 0);
+      transform: translateX(2px);
+      filter: drop-shadow(-2px 0 var(--alert)) drop-shadow(2px 0 var(--rad));
+    }
+    45% {
+      clip-path: inset(28% 0 52% 0);
+      transform: translateX(-1px);
+      filter: drop-shadow(2px 0 var(--alert)) drop-shadow(-2px 0 var(--rad));
+    }
+    60% {
+      clip-path: inset(80% 0 6% 0);
+      transform: translateX(1px);
+      filter: drop-shadow(-2px 0 var(--alert)) drop-shadow(2px 0 var(--rad));
+    }
+    75% {
+      clip-path: inset(12% 0 74% 0);
+      transform: translateX(0);
+      filter: drop-shadow(1px 0 var(--alert)) drop-shadow(-1px 0 var(--rad));
+    }
+    100% {
+      clip-path: inset(0 0 0 0);
+      transform: translateX(0);
+      filter: none;
+    }
+  }
+
+  .is-glitching {
+    animation: glitch-frames 0.3s steps(2, end) both;
+  }
+
+  /* 印章勾选：scale 落定 + steps(2) 机械跳帧 */
+  @keyframes stamp-in {
+    0% { transform: scale(1.4) rotate(-8deg); opacity: 0; }
+    50% { transform: scale(1.15) rotate(-5deg); opacity: 1; }
+    100% { transform: scale(1) rotate(-3deg); opacity: 1; }
+  }
+
+  .stamp-mark {
+    animation: stamp-in 0.25s steps(2, end) both;
+  }
+
+  /* 可解锁技能节点呼吸（单次） */
+  @keyframes breathe-once {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(217, 195, 58, 0); }
+    50% { box-shadow: 0 0 0 5px rgba(217, 195, 58, 0.25); }
+  }
+
+  .breathe-once {
+    animation: breathe-once 0.9s ease-out 1;
+  }
+
+  /* 打字机光标 */
+  @keyframes caret-blink {
+    0%, 49% { opacity: 1; }
+    50%, 100% { opacity: 0; }
+  }
+
+  .caret {
+    animation: caret-blink 0.8s steps(1) infinite;
+  }
+
+  /* 雷达完成闪光 → 淡出（加载屏收尾） */
+  @keyframes boot-flash {
+    0% { opacity: 1; }
+    40% { filter: brightness(1.6); }
+    100% { opacity: 0; }
+  }
+
+  .boot-leaving {
+    animation: boot-flash 0.35s ease-out both;
+  }
+
+  /* 数字/进度脉冲 */
+  @keyframes tick-pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.12); }
+    100% { transform: scale(1); }
+  }
+
+  .tick-pulse {
+    animation: tick-pulse 0.25s ease-out 1;
+  }
+}
+
+/* reduced-motion：强制关闭一切动画与过渡 */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+}

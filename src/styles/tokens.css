@@ -1,0 +1,37 @@
+/* 末日生存清单 · 废土暗黑风 Design Token（doc/03-视觉设计规范.md §2） */
+:root {
+  /* 色彩 */
+  --bg: #0D0F0C;
+  --bg-panel: #151814;
+  --bg-raised: #1C201A;
+  --border: #2E352A;
+  --border-strong: #3F4938;
+  --text: #C9CDBE;
+  --text-dim: #7C8471;
+  --warning: #D9C33A;
+  --alert: #C0533A;
+  --rad: #8FBE4F;
+  --rad-dim: #4A5C33;
+  --gray-p3: #5A614F;
+
+  /* 字体 */
+  --font-display: "Orbitron", "Noto Sans SC", "PingFang SC", sans-serif;
+  --font-body: -apple-system, "PingFang SC", "Noto Sans SC", "Microsoft YaHei", sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
+
+  --fs-12: 12px;
+  --fs-13: 13px;
+  --fs-15: 15px;
+  --fs-17: 17px;
+  --fs-22: 22px;
+  --fs-28: 28px;
+
+  /* 形状与质感 */
+  --radius-card: 4px;
+  --radius-btn: 2px;
+  --shadow-float: 0 8px 24px rgba(0, 0, 0, 0.6);
+
+  /* 尺寸 */
+  --shell-max: 480px;
+  --tabbar-h: 56px;
+}
