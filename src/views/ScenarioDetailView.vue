@@ -4,6 +4,7 @@ import { useRoute } from 'vue-router'
 import { useUserStore } from '../stores/user.js'
 import { SCENARIO_MAP } from '../data/scenarios.js'
 import { ITEM_MAP } from '../data/items.js'
+import RadiationGauge from '../components/RadiationGauge.vue'
 
 const route = useRoute()
 const store = useUserStore()
@@ -66,6 +67,8 @@ function isOwned(id) {
       </p>
       <p class="gap-line mono" :class="{ 'is-ok': gapLine.includes('已达标') }">{{ gapLine }}</p>
     </div>
+
+    <RadiationGauge v-if="scenario.id === 'nuclear'" :value="stats.rate" class="nuclear-gauge" />
 
     <div class="principle-card">
       <span class="card-label mono">首要原则</span>
@@ -195,6 +198,10 @@ function isOwned(id) {
 
 .gap-line.is-ok {
   color: var(--rad);
+}
+
+.nuclear-gauge {
+  margin-top: 16px;
 }
 
 /* 首要原则 */
