@@ -1,4 +1,10 @@
 <script setup>
+import { ref } from 'vue'
+import BootScreen from './components/BootScreen.vue'
+import GlitchRouter from './components/GlitchRouter.vue'
+
+const booted = ref(false)
+
 const tabs = [
   { to: '/', label: '清单', icon: 'list' },
   { to: '/scenarios', label: '场景', icon: 'pin' },
@@ -8,9 +14,10 @@ const tabs = [
 </script>
 
 <template>
+  <BootScreen v-if="!booted" @done="booted = true" />
   <div class="app-shell">
     <main class="app-main">
-      <router-view />
+      <GlitchRouter />
     </main>
 
     <nav class="tabbar" aria-label="主导航">
