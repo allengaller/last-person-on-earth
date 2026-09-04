@@ -103,6 +103,7 @@ onUnmounted(() => timers.forEach(clearTimeout))
   letter-spacing: 0.15em;
   background: var(--bg);
   padding: 2px 6px;
+  white-space: nowrap;
 }
 
 .boot-lines {

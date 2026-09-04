@@ -156,7 +156,8 @@ const hasAnyOwned = computed(() => Object.keys(store.owned).length > 0)
   background: var(--bg-panel);
   border: 1px solid var(--border);
   border-radius: var(--radius-btn);
-  padding: 8px 10px;
+  min-height: 44px;
+  padding: 8px 12px;
   cursor: pointer;
   transition: color 0.15s ease, border-color 0.15s ease;
 }
