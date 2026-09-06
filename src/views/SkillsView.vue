@@ -2,8 +2,10 @@
 import { computed, ref, watch } from 'vue'
 import { ITEM_MAP } from '../data/items.js'
 import { SKILLS, SKILL_BRANCHES } from '../data/skills.js'
+import { earnedBadges } from '../data/badges.js'
 import { useUserStore } from '../stores/user.js'
 import SkillTree from '../components/SkillTree.vue'
+import BadgeWall from '../components/BadgeWall.vue'
 
 const store = useUserStore()
 
@@ -14,6 +16,8 @@ const selected = computed(() => SKILLS.find((s) => s.id === selectedId.value) ||
 const state = computed(() => (selected.value ? store.skillsWithState(selected.value) : null))
 
 const practicedCount = computed(() => Object.keys(store.practiced).length)
+
+const badgeRows = computed(() => earnedBadges(store.owned, store.practiced))
 
 function select(skill) {
   selectedId.value = selectedId.value === skill.id ? null : skill.id
@@ -99,6 +103,8 @@ watch(
         <span v-else>标记已练习</span>
       </button>
     </article>
+
+    <BadgeWall :badges="badgeRows" />
   </section>
 </template>
 

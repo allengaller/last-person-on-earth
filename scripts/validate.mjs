@@ -4,6 +4,7 @@ import { CATEGORIES, CATEGORY_WEIGHTS, SCENARIO_LABELS } from '../src/data/categ
 import { SCENARIOS } from '../src/data/scenarios.js'
 import { SKILLS, SKILL_BRANCHES } from '../src/data/skills.js'
 import { GLOSSARY } from '../src/data/glossary.js'
+import { BADGES, earnedBadges } from '../src/data/badges.js'
 import {
   categoryRate,
   isSkillUnlocked,
@@ -102,6 +103,17 @@ assert(!isSkillUnlocked(SKILLS.find((s) => s.id === 'water-1'), {}, {}), '未拥
 const water2 = SKILLS.find((s) => s.id === 'water-2')
 assert(!isSkillUnlocked(water2, { 'fw-01': true, 'fw-03': true }, {}), '缺练习标记不解锁 tier2')
 assert(isSkillUnlocked(water2, { 'fw-01': true, 'fw-03': true }, { 'water-2': true }), '物资 + 练习标记解锁 tier2')
+
+console.log('> 校验成就徽章')
+assert(BADGES.length >= 8, `徽章 ≥ 8（实际 ${BADGES.length}）`)
+assert(new Set(BADGES.map((b) => b.id)).size === BADGES.length, '徽章 id 无重复')
+assert(earnedBadges({}, {}).every((b) => !b.earned), '空状态无徽章点亮')
+const allEarned = earnedBadges(allOwned, allPracticed)
+assert(allEarned.every((b) => b.earned), '全拥有 + 全练习点亮全部徽章')
+assert(earnedBadges({}, {}).length === BADGES.length, 'earnedBadges 返回全量徽章')
+const p1Owned = Object.fromEntries(ITEMS.filter((i) => i.priority === 'P1').map((i) => [i.id, true]))
+assert(earnedBadges(p1Owned, {}).find((b) => b.id === 'p1-complete')?.earned === true, '全 P1 入库点亮「有备无患」')
+assert(earnedBadges(p1Owned, {}).find((b) => b.id === 'legend')?.earned === false, '仅 P1 入库不点亮「废土传说」')
 
 console.log(failed === 0 ? '\n> 全部校验通过 [OK]' : `\n> ${failed} 项校验失败 [FAIL]`)
 process.exit(failed === 0 ? 0 : 1)
