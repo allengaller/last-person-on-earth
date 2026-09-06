@@ -6,6 +6,7 @@ import { earnedBadges } from '../data/badges.js'
 import { useUserStore } from '../stores/user.js'
 import SkillTree from '../components/SkillTree.vue'
 import BadgeWall from '../components/BadgeWall.vue'
+import GlossaryList from '../components/GlossaryList.vue'
 
 const store = useUserStore()
 
@@ -105,6 +106,8 @@ watch(
     </article>
 
     <BadgeWall :badges="badgeRows" />
+
+    <GlossaryList />
   </section>
 </template>
 
