@@ -98,6 +98,14 @@ export const useUserStore = defineStore('user', () => {
     createdAt.value = Date.now()
   }
 
+  function importState(data) {
+    for (const key of Object.keys(owned)) delete owned[key]
+    for (const key of Object.keys(practiced)) delete practiced[key]
+    Object.assign(owned, data.owned)
+    Object.assign(practiced, data.practiced)
+    createdAt.value = data.createdAt
+  }
+
   return {
     owned,
     practiced,
@@ -112,5 +120,6 @@ export const useUserStore = defineStore('user', () => {
     toggleOwned,
     togglePracticed,
     resetAll,
+    importState,
   }
 })

@@ -5,6 +5,7 @@ import { SCENARIOS } from '../src/data/scenarios.js'
 import { SKILLS, SKILL_BRANCHES } from '../src/data/skills.js'
 import { GLOSSARY } from '../src/data/glossary.js'
 import { BADGES, earnedBadges } from '../src/data/badges.js'
+import { serializeState, parseBackup } from '../src/utils/backup.js'
 import {
   categoryRate,
   isSkillUnlocked,
@@ -114,6 +115,25 @@ assert(earnedBadges({}, {}).length === BADGES.length, 'earnedBadges 返回全量
 const p1Owned = Object.fromEntries(ITEMS.filter((i) => i.priority === 'P1').map((i) => [i.id, true]))
 assert(earnedBadges(p1Owned, {}).find((b) => b.id === 'p1-complete')?.earned === true, '全 P1 入库点亮「有备无患」')
 assert(earnedBadges(p1Owned, {}).find((b) => b.id === 'legend')?.earned === false, '仅 P1 入库不点亮「废土传说」')
+
+console.log('> 校验备份导入导出')
+const stateSnapshot = { createdAt: 1700000000000, owned: { 'fw-01': true, 'md-04': true }, practiced: { 'water-1': true } }
+const backupJson = JSON.stringify(serializeState(stateSnapshot))
+const roundTrip = parseBackup(backupJson)
+assert(roundTrip.ok && roundTrip.data.owned['fw-01'] === true && roundTrip.data.practiced['water-1'] === true, '导出 → 导入往返一致')
+assert(roundTrip.data.createdAt === 1700000000000, 'createdAt 保留')
+const polluted = parseBackup(JSON.stringify({
+  schemaVersion: 1,
+  createdAt: 1,
+  owned: { 'fw-01': true, 'hack-x': true, 'md-04': 'yes' },
+  practiced: { 'water-1': true, 'nope-9': true },
+}))
+assert(polluted.ok && Object.keys(polluted.data.owned).length === 2 && polluted.data.owned['md-04'] === true
+  && Object.keys(polluted.data.practiced).length === 1, '未知 id 剔除、非布尔值收敛为 true')
+assert(parseBackup('{"schemaVersion":2}').ok === false, 'schemaVersion 不符拒绝')
+assert(parseBackup('not json').ok === false, '非 JSON 拒绝')
+assert(parseBackup('[1]').ok === false, '数组拒绝')
+assert(parseBackup(JSON.stringify({ schemaVersion: 1, owned: 'x', practiced: {} })).ok === false, 'owned 类型错误拒绝')
 
 console.log(failed === 0 ? '\n> 全部校验通过 [OK]' : `\n> ${failed} 项校验失败 [FAIL]`)
 process.exit(failed === 0 ? 0 : 1)

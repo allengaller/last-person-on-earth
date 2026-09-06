@@ -4,6 +4,7 @@ import { ITEMS } from '../data/items.js'
 import { CATEGORIES, CATEGORY_WEIGHTS } from '../data/categories.js'
 import { useUserStore } from '../stores/user.js'
 import { useTweened } from '../composables/useTweened.js'
+import { serializeState, parseBackup } from '../utils/backup.js'
 import RadarChart from '../components/RadarChart.vue'
 
 const store = useUserStore()
@@ -36,6 +37,44 @@ function onResetClick() {
   clearTimeout(confirmTimer)
   confirming.value = false
   store.resetAll()
+}
+
+const fileInput = ref(null)
+const backupMessage = ref('')
+const backupOk = ref(false)
+
+function onExport() {
+  const payload = serializeState({
+    createdAt: store.createdAt,
+    owned: store.owned,
+    practiced: store.practiced,
+  })
+  const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' })
+  const url = URL.createObjectURL(blob)
+  const a = document.createElement('a')
+  a.href = url
+  a.download = 'doomsday-backup.json'
+  a.click()
+  URL.revokeObjectURL(url)
+  backupOk.value = true
+  backupMessage.value = '> 已导出 doomsday-backup.json'
+}
+
+function onImportFile(event) {
+  const file = event.target.files?.[0]
+  event.target.value = ''
+  if (!file) return
+  file.text().then((text) => {
+    const result = parseBackup(text)
+    if (!result.ok) {
+      backupOk.value = false
+      backupMessage.value = `> 导入失败：${result.error}`
+      return
+    }
+    store.importState(result.data)
+    backupOk.value = true
+    backupMessage.value = `> 导入成功：${Object.keys(result.data.owned).length} 件物资 / ${Object.keys(result.data.practiced).length} 项练习`
+  })
 }
 </script>
 
@@ -72,7 +111,20 @@ function onResetClick() {
 
     <div class="block">
       <h2 class="block-title mono">&gt; 数据管理</h2>
-      <p class="data-note">入库与练习记录仅保存在本机浏览器，可随时重置。</p>
+      <p class="data-note">入库与练习记录仅保存在本机浏览器，可导出 JSON 备份或从备份导入（导入将覆盖当前数据）。</p>
+      <div class="backup-row">
+        <button type="button" class="backup-btn" @click="onExport">导出清单（JSON）</button>
+        <button type="button" class="backup-btn" @click="fileInput?.click()">导入清单</button>
+        <input
+          ref="fileInput"
+          type="file"
+          accept="application/json,.json"
+          class="file-input"
+          aria-label="选择备份 JSON 文件"
+          @change="onImportFile"
+        />
+      </div>
+      <p v-if="backupMessage" class="mono backup-msg" :class="backupOk ? 'is-ok' : 'is-err'">{{ backupMessage }}</p>
       <button
         type="button"
         class="reset-btn"
@@ -200,6 +252,49 @@ function onResetClick() {
   color: var(--text-dim);
   font-size: var(--fs-13);
   margin: 0 0 12px;
+}
+
+.backup-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.backup-btn {
+  min-height: 44px;
+  background: transparent;
+  border: 1px solid var(--border-strong);
+  color: var(--text);
+  font-size: var(--fs-13);
+  cursor: pointer;
+}
+
+.backup-btn:active {
+  border-color: var(--rad);
+  color: var(--rad);
+}
+
+.file-input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.backup-msg {
+  margin: 0 0 10px;
+  font-size: var(--fs-12);
+}
+
+.backup-msg.is-ok {
+  color: var(--rad);
+}
+
+.backup-msg.is-err {
+  color: var(--alert);
 }
 
 .reset-btn {
